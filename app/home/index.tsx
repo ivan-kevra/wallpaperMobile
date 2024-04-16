@@ -1,7 +1,7 @@
 import {theme} from '@/constants/theme';
 import {hp, wp} from '@/helpers/common';
 import {FontAwesome6} from '@expo/vector-icons';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -14,19 +14,35 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Feather} from '@expo/vector-icons';
 import {Ionicons} from '@expo/vector-icons';
 import Categories from '@/components/categories';
+import {apiCall} from '@/api/api';
+import ImageGrid from '@/components/ImageGrid';
 
 const HomeScreen: React.FC = () => {
   const {top} = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 10 : 30;
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async (params = {page: 1}, append = true) => {
+    let res = await apiCall(params);
+    if (res?.success && res?.data.hits) {
+      if (append) {
+        setImages([...images, ...res.data.hits]);
+      } else {
+        setImages([...res.data.hits]);
+      }
+    }
+  };
 
   const handleChangeCategory = (category: string | null) => {
     setActiveCategory(category);
   };
-
-  console.log('active categoty: ', activeCategory);
 
   return (
     <View style={(styles.container, {paddingTop})}>
@@ -76,6 +92,9 @@ const HomeScreen: React.FC = () => {
             handleChangeCategory={handleChangeCategory}
           />
         </View>
+
+        {/* images */}
+        <View>{images.length > 0 && <ImageGrid images={images} />}</View>
       </ScrollView>
     </View>
   );

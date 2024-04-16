@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, FlatList, Pressable} from 'react-native';
+import {Text, StyleSheet, FlatList, Pressable} from 'react-native';
 import React from 'react';
 import {data} from '@/constants/data';
 import {hp, wp} from '@/helpers/common';
@@ -62,7 +62,7 @@ const CategoryItem = ({
 
 const styles = StyleSheet.create({
   flatlistContainer: {
-    paddingHorizontal: wp(5),
+    paddingHorizontal: wp(4),
     gap: 8,
   },
   category: {

@@ -18,7 +18,6 @@ const WelcomeScreen = () => {
         style={styles.bgImage}
         resizeMode="cover"
       />
-      <Text>WelcomeScreen</Text>
       {/* linear gadient */}
       <Animated.View entering={FadeInDown.duration(600)} style={{flex: 1}}>
         <LinearGradient

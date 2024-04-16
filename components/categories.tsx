@@ -62,7 +62,7 @@ const CategoryItem = ({
 
 const styles = StyleSheet.create({
   flatlistContainer: {
-    paddingHorizontal: wp(4),
+    paddingHorizontal: wp(5),
     gap: 8,
   },
   category: {

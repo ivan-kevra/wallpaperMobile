@@ -16,20 +16,21 @@ import {Ionicons} from '@expo/vector-icons';
 import Categories from '@/components/categories';
 import {apiCall} from '@/api/api';
 import ImageGrid from '@/components/ImageGrid';
+import {ImageType} from '@/types';
 
 const HomeScreen: React.FC = () => {
   const {top} = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 10 : 30;
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageType[]>([]);
   const searchInputRef = useRef(null);
 
   useEffect(() => {
     fetchImages();
   }, []);
 
-  const fetchImages = async (params = {page: 1}, append = true) => {
+  const fetchImages = async (params = {page: 1}, append = false) => {
     let res = await apiCall(params);
     if (res?.success && res?.data.hits) {
       if (append) {

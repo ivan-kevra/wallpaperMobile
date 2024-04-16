@@ -1,24 +1,41 @@
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {MasonryFlashList} from '@shopify/flash-list';
 import ImageCard from './ImageCard';
+import {getColumnCount, wp} from '@/helpers/common';
+import React from 'react';
+import {ImageType} from '@/types';
 
 type Props = {
-  images: string[];
+  images: ImageType[];
 };
 
-const ImageGrid = ({images}: Props) => {
+const ImageGrid: React.FC<Props> = ({images}) => {
+  const columns = getColumnCount();
+
   return (
-    <View>
+    <View style={styles.container}>
       <MasonryFlashList
         data={images}
-        numColumns={2}
-        renderItem={({item}) => <ImageCard item={item} />}
+        numColumns={columns}
+        renderItem={({item, index}) => (
+          <ImageCard item={item} index={index} columns={columns} />
+        )}
         estimatedItemSize={200}
+        contentContainerStyle={styles.listContainer}
+        // initialNumToRender={10}
       />
     </View>
   );
 };
 
-// const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    minHeight: 3,
+    width: wp(100),
+  },
+  listContainer: {
+    paddingHorizontal: wp(4),
+  },
+});
 
 export default ImageGrid;

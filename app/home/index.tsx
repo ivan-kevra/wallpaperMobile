@@ -1,7 +1,7 @@
 import {theme} from '@/constants/theme';
 import {hp, wp} from '@/helpers/common';
 import {FontAwesome6} from '@expo/vector-icons';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import Categories from '@/components/categories';
 import {apiCall} from '@/api/api';
 import ImageGrid from '@/components/ImageGrid';
 import {ImageType} from '@/types';
+import {debounce} from 'lodash';
 
 const HomeScreen: React.FC = () => {
   const {top} = useSafeAreaInsets();
@@ -45,6 +46,14 @@ const HomeScreen: React.FC = () => {
     setActiveCategory(category);
   };
 
+  const handleSearch = (text: string) => {
+    console.log('search', text);
+  };
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), [
+    handleSearch,
+  ]);
+
   return (
     <View style={(styles.container, {paddingTop})}>
       {/* header */}
@@ -70,7 +79,7 @@ const HomeScreen: React.FC = () => {
           <TextInput
             placeholder="Search for photos..."
             style={styles.searchInput}
-            onChange={e => setSearch(e.nativeEvent.text)}
+            onChange={handleTextDebounce}
             value={search}
             ref={searchInputRef}
           />

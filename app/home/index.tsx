@@ -18,6 +18,8 @@ import { apiCall } from '@/api/api';
 import ImageGrid from '@/components/ImageGrid';
 import { FetchImagesParamsType, ImageType } from '@/types';
 import { debounce } from 'lodash';
+import FiltersModal from '@/components/filtersModal';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 
 var page = 1;
@@ -31,6 +33,8 @@ const HomeScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [images, setImages] = useState<ImageType[]>([]);
   const searchInputRef = useRef(null);
+  const modalRef = useRef<BottomSheetModal>(null);
+  // const modalRef = useRef(null);
 
   useEffect(() => {
     fetchImages();
@@ -47,6 +51,13 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  const openFiltersModal = () => {
+    modalRef.current?.present();
+  }
+
+  const closeFiltersModal = () => {
+    modalRef.current?.close();
+  }
   const handleChangeCategory = (category: string | null) => {
     setActiveCategory(category);
     clearSearch()
@@ -80,7 +91,6 @@ const HomeScreen: React.FC = () => {
   };
 
   const clearSearch = () => {
-    // handleSearch("");
     setSearch("");
     (searchInputRef?.current as any).clear()
     fetchImages({ page, });
@@ -94,7 +104,7 @@ const HomeScreen: React.FC = () => {
       {/* header */}
       <View style={styles.header}>
         <Text style={styles.title}>Pixels</Text>
-        <Pressable>
+        <Pressable onPress={openFiltersModal}>
           <FontAwesome6
             name="bars-staggered"
             size={22}
@@ -142,6 +152,10 @@ const HomeScreen: React.FC = () => {
         {/* images */}
         <View>{images.length > 0 && <ImageGrid images={images} />}</View>
       </ScrollView>
+
+      {/* filters modal */}
+
+      <FiltersModal modalRef={modalRef} />
     </View>
   );
 };

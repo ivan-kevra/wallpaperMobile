@@ -49,6 +49,15 @@ const HomeScreen: React.FC = () => {
 
   const handleChangeCategory = (category: string | null) => {
     setActiveCategory(category);
+    clearSearch()
+    setImages([])
+    page = 1
+    let params = {
+      page,
+      category,
+    }
+    if (category) params.category = category;
+    fetchImages(params, false);
   };
 
   const handleSearch = (text: string) => {
@@ -57,18 +66,25 @@ const HomeScreen: React.FC = () => {
     if (text.length > 2) {
       page = 1
       setImages([])
-      fetchImages({ page, q: text });
+      setActiveCategory(null) // clear category when searching
+      fetchImages({ page, q: text }, false);
     }
     if (text == '') {
-      page = 1
+      // reset results
+      page = 1;
+      (searchInputRef?.current as any).clear()
       setImages([])
+      setActiveCategory(null) // clear category when searching
       fetchImages({ page, });
     }
   };
 
   const clearSearch = () => {
+    // handleSearch("");
     setSearch("");
     (searchInputRef?.current as any).clear()
+    fetchImages({ page, });
+
   }
 
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);

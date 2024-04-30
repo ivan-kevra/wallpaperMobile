@@ -29,3 +29,8 @@ export type ImageType = {
   user: string;
   userImageURL: string;
 };
+
+export type FetchImagesParamsType = {
+  page: number;
+  q?: string;
+}

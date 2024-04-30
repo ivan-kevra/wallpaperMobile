@@ -1,7 +1,7 @@
-import {theme} from '@/constants/theme';
-import {hp, wp} from '@/helpers/common';
-import {FontAwesome6} from '@expo/vector-icons';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import { theme } from '@/constants/theme';
+import { hp, wp } from '@/helpers/common';
+import { FontAwesome6 } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -10,17 +10,22 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Feather} from '@expo/vector-icons';
-import {Ionicons} from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Categories from '@/components/categories';
-import {apiCall} from '@/api/api';
+import { apiCall } from '@/api/api';
 import ImageGrid from '@/components/ImageGrid';
-import {ImageType} from '@/types';
-import {debounce} from 'lodash';
+import { FetchImagesParamsType, ImageType } from '@/types';
+import { debounce } from 'lodash';
+
+
+var page = 1;
+
+
 
 const HomeScreen: React.FC = () => {
-  const {top} = useSafeAreaInsets();
+  const { top } = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 10 : 30;
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -31,7 +36,7 @@ const HomeScreen: React.FC = () => {
     fetchImages();
   }, []);
 
-  const fetchImages = async (params = {page: 1}, append = false) => {
+  const fetchImages = async (params: FetchImagesParamsType = { page: 1 }, append = false) => {
     let res = await apiCall(params);
     if (res?.success && res?.data.hits) {
       if (append) {
@@ -48,14 +53,28 @@ const HomeScreen: React.FC = () => {
 
   const handleSearch = (text: string) => {
     console.log('search', text);
+    setSearch(text)
+    if (text.length > 2) {
+      page = 1
+      setImages([])
+      fetchImages({ page, q: text });
+    }
+    if (text == '') {
+      page = 1
+      setImages([])
+      fetchImages({ page, });
+    }
   };
 
-  const handleTextDebounce = useCallback(debounce(handleSearch, 400), [
-    handleSearch,
-  ]);
+  const clearSearch = () => {
+    setSearch("");
+    (searchInputRef?.current as any).clear()
+  }
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
   return (
-    <View style={(styles.container, {paddingTop})}>
+    <View style={(styles.container, { paddingTop })}>
       {/* header */}
       <View style={styles.header}>
         <Text style={styles.title}>Pixels</Text>
@@ -67,7 +86,7 @@ const HomeScreen: React.FC = () => {
           />
         </Pressable>
       </View>
-      <ScrollView contentContainerStyle={{gap: 15}}>
+      <ScrollView contentContainerStyle={{ gap: 15 }}>
         <View style={styles.seacrchBar}>
           <View style={styles.searchIcon}>
             <Feather
@@ -79,18 +98,19 @@ const HomeScreen: React.FC = () => {
           <TextInput
             placeholder="Search for photos..."
             style={styles.searchInput}
-            onChange={handleTextDebounce}
-            value={search}
+            onChangeText={handleTextDebounce}
+            // value={search}
             ref={searchInputRef}
           />
           {search && (
             <Pressable
               style={styles.closeIcon}
-              onPress={() => setSearch(undefined)}>
+              onPress={clearSearch}>
               <Ionicons
                 name="close"
                 size={24}
                 color={theme.colors.neutral(0.6)}
+
               />
             </Pressable>
           )}

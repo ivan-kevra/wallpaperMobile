@@ -1,16 +1,26 @@
-import { StyleSheet, Text } from 'react-native';
-import React, { useMemo } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { RefObject, useMemo } from 'react';
 import {
     BottomSheetModal,
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
+import { capitalize, hp } from '@/helpers/common';
+import { theme } from '@/constants/theme';
+import { ColorFilter, CommonFilterRow, SectionView } from './filterViews';
+import { data } from '@/constants/data';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
 type Props = {
-    modalRef: any
+    modalRef: ((instance: BottomSheetModalMethods | null) => void) | RefObject<BottomSheetModalMethods> | null | undefined
+    filters: any
+    setFilters: (filter: any) => void
+    onApply: () => void
+    onReset: () => void
+    onClose: () => void
 };
-const FiltersModal = ({ modalRef }: Props) => {
+const FiltersModal = ({ modalRef, filters, setFilters, onApply, onReset, onClose }: Props) => {
 
     const snapPoints = useMemo(() => ['75%'], []);
 
@@ -23,11 +33,55 @@ const FiltersModal = ({ modalRef }: Props) => {
             backdropComponent={CustomBackdrop}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text>Awesome 🎉</Text>
+                <View style={styles.content}>
+                    <Text style={styles.filterText}>Filters</Text>
+                    {
+                        Object.keys(sections).map((sectionName, index) => {
+                            let sectionView = sections[sectionName]
+                            let sectionData = data.filters[sectionName]
+                            let title = capitalize(sectionName)
+                            return (
+                                <View key={title}>
+                                    <SectionView
+                                        title={title}
+                                        content={sectionView({
+                                            data: sectionData,
+                                            filters,
+                                            setFilters,
+                                            filterName: sectionName
+                                        })}
+                                    />
+                                </View>
+                            )
+                        })
+                    }
+
+                    {/* actions */}
+                    <View style={styles.buttons}>
+                        <Pressable style={styles.resetButton} onPress={onReset}>
+                            <Text style={[styles.buttonText, { color: theme.colors.neutral(0.9) }]}>Reset</Text>
+                        </Pressable>
+                        <Pressable style={styles.applyButton} onPress={onApply}>
+                            <Text style={[styles.buttonText, { color: theme.colors.white }]}>Apply</Text>
+                        </Pressable>
+                    </View>
+
+                </View>
             </BottomSheetView>
-        </BottomSheetModal>
+        </BottomSheetModal >
     );
 };
+
+type SectionsType = {
+    [key: string]: (props: any) => JSX.Element
+}
+
+const sections: SectionsType = {
+    "order": (props: any) => <CommonFilterRow {...props} />,
+    "orientation": (props: any) => <CommonFilterRow {...props} />,
+    "type": (props: any) => <CommonFilterRow {...props} />,
+    "colors": (props: any) => <ColorFilter {...props} />,
+}
 
 
 const CustomBackdrop = ({ animatedIndex, style }: any) => {
@@ -51,19 +105,56 @@ const CustomBackdrop = ({ animatedIndex, style }: any) => {
     );
 }
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 24,
-        justifyContent: 'center',
-        backgroundColor: 'grey',
-    },
+
     contentContainer: {
         flex: 1,
         alignItems: 'center',
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    }
+    },
+    content: {
+        flex: 1,
+        gap: 15,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    filterText: {
+        fontSize: hp(4),
+        fontWeight: theme.fontWeights.semibold,
+        color: theme.colors.neutral(0.8),
+        marginBottom: 5
+    },
+    buttons: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: "center",
+        gap: 10
+    },
+    applyButton: {
+        flex: 1,
+        backgroundColor: theme.colors.neutral(0.8),
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: theme.radius.md,
+        borderCurve: 'continuous',
+    },
+    resetButton: {
+        flex: 1,
+        backgroundColor: theme.colors.neutral(0.03),
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: theme.radius.md,
+        borderCurve: 'continuous',
+        borderWidth: 2,
+        borderColor: theme.colors.grayBG
+    },
+    buttonText: {
+        fontSize: hp(2.2)
+    },
+
 });
 
 export default FiltersModal;

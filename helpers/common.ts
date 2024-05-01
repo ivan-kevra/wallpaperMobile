@@ -1,6 +1,6 @@
-import {Dimensions} from 'react-native';
+import { Dimensions } from 'react-native';
 
-const {width: deviceWidth, height: deviceHeight} = Dimensions.get('window');
+const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 export const wp = (percentage: number) => {
   const width = deviceWidth;
@@ -29,3 +29,7 @@ export const getImageSize = (height: number, width: number) => {
     return 200;
   }
 };
+
+export const capitalize = (str: string) => {
+  return str.replace(/\b\w/g, l => l.toUpperCase());
+}

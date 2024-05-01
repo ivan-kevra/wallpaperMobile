@@ -32,9 +32,10 @@ const HomeScreen: React.FC = () => {
   const [search, setSearch] = useState<string | undefined>(undefined);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [images, setImages] = useState<ImageType[]>([]);
+  const [filters, setFilters] = useState<any>(null);
   const searchInputRef = useRef(null);
   const modalRef = useRef<BottomSheetModal>(null);
-  // const modalRef = useRef(null);
+
 
   useEffect(() => {
     fetchImages();
@@ -58,6 +59,29 @@ const HomeScreen: React.FC = () => {
   const closeFiltersModal = () => {
     modalRef.current?.close();
   }
+
+  const applyFilters = () => {
+    if (filters) {
+      page = 1
+      setImages([])
+      let params = {
+        page,
+        ...filters
+      }
+      if (activeCategory) params.category = activeCategory;
+      if (search) params.q = search
+      fetchImages(params, false);
+    }
+    console.log('apply filters');
+    closeFiltersModal()
+  }
+
+  const resetFilters = () => {
+    console.log('reset filters');
+    setFilters(null)
+    closeFiltersModal()
+  }
+
   const handleChangeCategory = (category: string | null) => {
     setActiveCategory(category);
     clearSearch()
@@ -98,6 +122,9 @@ const HomeScreen: React.FC = () => {
   }
 
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
+
+
+  console.log('filters', filters);
 
   return (
     <View style={(styles.container, { paddingTop })}>
@@ -155,7 +182,12 @@ const HomeScreen: React.FC = () => {
 
       {/* filters modal */}
 
-      <FiltersModal modalRef={modalRef} />
+      <FiltersModal modalRef={modalRef}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={applyFilters}
+        onReset={resetFilters}
+        onClose={closeFiltersModal} />
     </View>
   );
 };

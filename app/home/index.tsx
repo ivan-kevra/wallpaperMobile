@@ -36,12 +36,14 @@ const HomeScreen: React.FC = () => {
   const [filters, setFilters] = useState<any>(null);
   const searchInputRef = useRef(null);
   const modalRef = useRef<BottomSheetModal>(null);
+  const scrollRef = useRef<ScrollView>(null)
+  const [isEndReached, setIsEndReached] = useState(false);
 
 
   useEffect(() => {
     fetchImages();
   }, []);
-  const fetchImages = async (params: FetchImagesParamsType = { page: 1 }, append = false) => {
+  const fetchImages = async (params: FetchImagesParamsType = { page: 1 }, append = true) => {
     let res = await apiCall(params);
     if (res?.success && res?.data.hits) {
       if (append) {
@@ -135,15 +137,46 @@ const HomeScreen: React.FC = () => {
     setSearch("");
     (searchInputRef?.current as any).clear()
     fetchImages({ page, });
-
   }
+  const handleScroll = (event: any) => {
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height
+    const scrollOffSet = event.nativeEvent.contentOffset.y
+    const bottomPosition = contentHeight - scrollViewHeight
+
+    if (scrollOffSet >= bottomPosition - 1) {
+      if (!isEndReached) {
+        setIsEndReached(true)
+        console.log('end reached');
+
+        ++page
+        let params = {
+          page,
+          ...filters
+        }
+        if (activeCategory) params.category = activeCategory;
+        if (search) params.q = search
+        fetchImages(params);
+      }
+      // setIsEndReached(true)
+    } else if (isEndReached) {
+      setIsEndReached(false)
+    }
+  }
+
+  const handleScrollUp = () => {
+    scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true })
+  }
+
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
   return (
     <View style={(styles.container, { paddingTop })}>
       {/* header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Pixels</Text>
+        <Pressable onPress={handleScrollUp}>
+          <Text style={styles.title}>Pixels</Text>
+        </Pressable>
         <Pressable onPress={openFiltersModal}>
           <FontAwesome6
             name="bars-staggered"
@@ -152,7 +185,12 @@ const HomeScreen: React.FC = () => {
           />
         </Pressable>
       </View>
-      <ScrollView contentContainerStyle={{ gap: 15 }}>
+      <ScrollView
+        contentContainerStyle={{ gap: 15 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={5}
+        ref={scrollRef}
+      >
         <View style={styles.seacrchBar}>
           <View style={styles.searchIcon}>
             <Feather

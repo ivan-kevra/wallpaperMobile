@@ -4,7 +4,7 @@ import {
     BottomSheetModal,
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import Animated, { Extrapolation, FadeInDown, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { capitalize, hp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
@@ -41,7 +41,9 @@ const FiltersModal = ({ modalRef, filters, setFilters, onApply, onReset, onClose
                             let sectionData = data.filters[sectionName]
                             let title = capitalize(sectionName)
                             return (
-                                <View key={title}>
+                                <Animated.View
+                                    key={sectionName}
+                                    entering={FadeInDown.delay((index + 100) + 100).springify().damping(11)}>
                                     <SectionView
                                         title={title}
                                         content={sectionView({
@@ -51,20 +53,23 @@ const FiltersModal = ({ modalRef, filters, setFilters, onApply, onReset, onClose
                                             filterName: sectionName
                                         })}
                                     />
-                                </View>
+                                </Animated.View>
                             )
                         })
                     }
 
                     {/* actions */}
-                    <View style={styles.buttons}>
+                    <Animated.View
+                        style={styles.buttons}
+                        entering={FadeInDown.delay(500).springify().damping(11)}>
+
                         <Pressable style={styles.resetButton} onPress={onReset}>
                             <Text style={[styles.buttonText, { color: theme.colors.neutral(0.9) }]}>Reset</Text>
                         </Pressable>
                         <Pressable style={styles.applyButton} onPress={onApply}>
                             <Text style={[styles.buttonText, { color: theme.colors.white }]}>Apply</Text>
                         </Pressable>
-                    </View>
+                    </Animated.View >
 
                 </View>
             </BottomSheetView>

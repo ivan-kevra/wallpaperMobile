@@ -9,8 +9,9 @@ type Props = {
   item: ImageType;
   index: number;
   columns: number;
+  router: any;
 };
-const ImageCard = ({item, index, columns}: Props) => {
+const ImageCard = ({item, index, columns, router}: Props) => {
   const isLastInRow = () => {
     return (index + 1) % columns === 0;
   };
@@ -19,7 +20,9 @@ const ImageCard = ({item, index, columns}: Props) => {
     return {height: getImageSize(height, width)};
   };
   return (
-    <Pressable style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}>
+    <Pressable
+      onPress={() => router.push({pathname: 'home/image', params: {...item}})}
+      style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}>
       <Image
         style={[styles.image, getImageHeight()]}
         source={{uri: item.webformatURL}}

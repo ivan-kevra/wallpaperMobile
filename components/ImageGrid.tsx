@@ -7,9 +7,10 @@ import {ImageType} from '@/types';
 
 type Props = {
   images: ImageType[];
+  router: any;
 };
 
-const ImageGrid: React.FC<Props> = ({images}) => {
+const ImageGrid: React.FC<Props> = ({images, router}) => {
   const columns = getColumnCount();
 
   return (
@@ -18,7 +19,12 @@ const ImageGrid: React.FC<Props> = ({images}) => {
         data={images}
         numColumns={columns}
         renderItem={({item, index}) => (
-          <ImageCard item={item} index={index} columns={columns} />
+          <ImageCard
+            item={item}
+            index={index}
+            columns={columns}
+            router={router}
+          />
         )}
         estimatedItemSize={200}
         contentContainerStyle={styles.listContainer}
